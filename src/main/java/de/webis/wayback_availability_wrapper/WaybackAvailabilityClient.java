@@ -2,6 +2,7 @@ package de.webis.wayback_availability_wrapper;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -46,7 +47,18 @@ public class WaybackAvailabilityClient {
 	
 	private static String availabilityRequestOrFail(String url, Date date) {
 		try {
-			return IOUtils.toString(new URL(requestUrl(url, date)), StandardCharsets.UTF_8);
+			URL requestUrl = new URL(requestUrl(url, date));
+			return IOUtils.toString(requestUrl, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static String sparklineRequest(String url) {
+		try {
+			String encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8.toString());
+			URL requestUrl = new URL("https://web.archive.org/__wb/sparkline?output=json&url=" + encodedUrl + "&collection=web"); 
+			return IOUtils.toString(requestUrl, StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
